@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import cv2
 import numpy as np
 from IPython import display
@@ -12,11 +6,8 @@ import datetime
 import os
 
 
-# In[2]:
-
-
 #初めの画像を取り込む
-camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture(1)
 
 ret, frame = camera.read()
 
@@ -30,7 +21,7 @@ else:
 
 # In[ ]:
 
-
+'''
 #1秒おきに保存
 def save_frame_camera_cycle(device_num, dir_path, basename, cycle, ext='png', delay=1, window_name='frame'):
     cap = cv2.VideoCapture(0)
@@ -58,33 +49,29 @@ def save_frame_camera_cycle(device_num, dir_path, basename, cycle, ext='png', de
 save_frame_camera_cycle(0, 'data/', 'camera_capture_cycle', 300)
 
 
-# In[7]:
-
 
 #背景差分の画像を取り出す
 
-if __name__ == '__main__'
+if __name__ == '__main__':
     # 画像の読み込み
-    img_src1 = cv2.imread("start.png", 1)
-    img_src2 = cv2.imread("final.png", 1)
+    img_src1 = cv2.imread("start.png", 0)
+    img_src2 = cv2.imread("final.png", 0)
 
-    fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
+    fgbg = cv2.createBackgroundSubtractorMOG2()
 
     fgmask = fgbg.apply(img_src1)
     fgmask = fgbg.apply(img_src2)
 
     # 表示
-    cv2.imshow('frame',fgmask)
+    cv2.imshow('frame', fgmask)
 
     # 検出画像
-    bg_diff_path  = './result.png'
-    cv2.imwrite(bg_diff_path,fgmask)
+    bg_diff_path = 'result.png'
+    cv2.imwrite(bg_diff_path, fgmask)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-
-# In[ ]:
 
 
 #画像読み込み
@@ -95,8 +82,11 @@ gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 #2値化
 ret, bin_img = cv2.threshold(gray, 86, 100, cv2.THRESH_BINARY_INV)
-imshow(bin_img)
-
+#cv2.imshow(bin_img)
+threshold = 120
+bin_img = gray.copy()
+bin_img[bin_img<threshold] = 0
+bin_img[bin_img>=threshold] = 255
 #輪郭抽出
 contours, hierarchy = cv2.findContours(bin_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -104,7 +94,7 @@ contours, hierarchy = cv2.findContours(bin_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APP
 contours = list(filter(lambda x: cv2.contourArea(x)>100000, contours))
 
 #輪郭を描写
-cv2.drawContours(img,contours, -1, color=(0,0,255),thickness=10)
+cv2.drawContours(img, contours, -1, color=(0,255,0),thickness=5)
 
 final_area = 0
 
@@ -112,6 +102,9 @@ for i in range(len(contours)):
     area = cv2.contourArea(contours[i])
     print(i, area)
     final_area = final_area + area
-imshow(img)
+
+cv2.imshow('', img)
+cv2.imwrite('outline.png', img)
 print(final_area)
 
+'''
