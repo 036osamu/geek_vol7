@@ -7,25 +7,26 @@ import os
 import time
 import firebase_admin
 from firebase_admin import credentials
-from firebase_admin import firestore
+from firebase_admin import firestore, storage
 
 
 if __name__ == '__main__':
-    #firebaseの初期設定
     cred = credentials.Certificate(
         "/Users/daiki.m/Desktop/supporters/gikucamp-firebase-adminsdk-bw43u-2fb954e096.json")
-    firebase_admin.initialize_app(cred)
+    firebase_admin.initialize_app(cred, {'storageBucket': 'gikucamp.appspot.com'})
     db = firestore.client()
     doc_ref = db.collection(u'data').document(u'90TwVL13wTuPpmCgw24C')
     ref = db.collection(u'data')
     docs = ref.stream()
 
+    bucket = storage.bucket()
+    filename = 'outline.png'
+    content_type = 'outline/png'
+    blob = bucket.blob(filename)
 
-    # 現在画像を取り込む
-    # camera = cv2.VideoCapture(1)
-    #
-    # ret, frame = camera.read()
+
     for i in range(0, 100, 20):
+        # 現在画像を取り込む
         camera = cv2.VideoCapture(1)
         ret, frame = camera.read()
         if ret:
@@ -40,15 +41,15 @@ if __name__ == '__main__':
         # 画像の読み込み
         img_src1 = cv2.imread("start.png", 0)
         img_src2 = cv2.imread("final.png", 0)
-    
+
         fgbg = cv2.createBackgroundSubtractorMOG2()
-    
+
         fgmask = fgbg.apply(img_src1)
         fgmask = fgbg.apply(img_src2)
 
         # 表示
         #cv2.imshow('frame', fgmask)
-    
+
         # 検出画像
         bg_diff_path = 'result.png'
         cv2.imwrite(bg_diff_path, fgmask)
@@ -105,3 +106,6 @@ if __name__ == '__main__':
         doc_ref.set({
             u'amount': f"{input_cvdata}",
         })
+
+        with open(filename, 'rb') as f:
+            blob.upload_from_file(f, content_type=content_type)
