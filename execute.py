@@ -26,6 +26,8 @@ if __name__ == '__main__':
 
 
     for i in range(0, 100, 20):
+        filename = f"outline{i}.png"
+
         # 現在画像を取り込む
         camera = cv2.VideoCapture(1)
         ret, frame = camera.read()
@@ -85,7 +87,7 @@ if __name__ == '__main__':
             final_area = final_area + area
 
         cv2.imshow('', img)
-        cv2.imwrite('outline.png', img)
+        cv2.imwrite(f'outline{i}.png', img)
         print(final_area)
 
         # cred = credentials.Certificate(
