@@ -20,14 +20,15 @@ if __name__ == '__main__':
     docs = ref.stream()
 
     bucket = storage.bucket()
-    filename = 'outline.png'
+    filename = 'aaa.png'
     content_type = 'outline/png'
-    blob = bucket.blob(filename)
+    #blob = bucket.blob(filename)
 
 
     for i in range(0, 100, 20):
         filename = f"outline{i}.png"
-
+        blob = bucket.blob(filename)
+        print(filename)
         # 現在画像を取り込む
         camera = cv2.VideoCapture(1)
         ret, frame = camera.read()
@@ -81,9 +82,9 @@ if __name__ == '__main__':
 
         final_area = 0
 
-        for i in range(len(contours)):
-            area = cv2.contourArea(contours[i])
-            print(i, area)
+        for a in range(len(contours)):
+            area = cv2.contourArea(contours[a])
+            print(a, area)
             final_area = final_area + area
 
         cv2.imshow('', img)
