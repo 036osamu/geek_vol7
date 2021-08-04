@@ -73,8 +73,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function CustomizedProgressBars(props) {
     const classes = useStyles();
-    console.log(props.progress);
-    console.log(props.max);
+    // console.log(props.progress);
+    // console.log(props.max);
 
     return (
         <div className={classes.root}>
