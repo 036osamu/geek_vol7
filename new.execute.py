@@ -5,28 +5,29 @@ from matplotlib import pyplot as plt
 import datetime
 import os
 import time
-# import firebase_admin
-# from firebase_admin import credentials
-# from firebase_admin import firestore, storage
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore, storage
 
 
 if __name__ == '__main__':
-    # cred = credentials.Certificate(
-    #     "/Users/daiki.m/Desktop/supporters/gikucamp-firebase-adminsdk-bw43u-2fb954e096.json")
-    # firebase_admin.initialize_app(cred, {'storageBucket': 'gikucamp.appspot.com'})
-    # db = firestore.client()
-    # doc_ref = db.collection(u'data').document(u'90TwVL13wTuPpmCgw24C')
-    # ref = db.collection(u'data')
-    # docs = ref.stream()
+    cred = credentials.Certificate(
+        "/Users/daiki.m/Desktop/supporters/gikucamp-firebase-adminsdk-bw43u-2fb954e096.json")
+    firebase_admin.initialize_app(cred, {'storageBucket': 'gikucamp.appspot.com'})
+    db = firestore.client()
+    doc_ref = db.collection(u'data').document(u'90TwVL13wTuPpmCgw24C')
+    ref = db.collection(u'data')
+    docs = ref.stream()
 
-    # bucket = storage.bucket()
-    # filename = 'outline.png'
-    # content_type = 'outline/png'
-    # blob = bucket.blob(filename)
-    # filename2 = 'tiny.png'
-    # blob = bucket.blob(filename2)
+    bucket = storage.bucket()
+    #filename = 'outline.png'
+    #blob = bucket.blob(filename)
+    content_type = 'outline/png'
 
-    '''
+    filename2 = 'img_gomi.png'
+    blob = bucket.blob(filename2)
+
+
     # 現在画像を取り込む
     camera = cv2.VideoCapture(1)
     ret, frame = camera.read()
@@ -37,11 +38,11 @@ if __name__ == '__main__':
     else:
         print('Failed')
 
-    '''
-    #start_name = 'start.png'
-    #final_name = 'final.png'
-    start_name = 'outline40.png'
-    final_name = 'outline0.png'
+
+    start_name = 'start.png'
+    final_name = 'final.png'
+    # start_name = 'outline40.png'
+    # final_name = 'outline0.png'
     # 画像の読み込み
     img_src1 = cv2.imread(start_name, 0)
     img_src2 = cv2.imread(final_name, 0)
@@ -66,7 +67,6 @@ if __name__ == '__main__':
 
     # 2値化
     ret, bin_img = cv2.threshold(gray, 86, 100, cv2.THRESH_BINARY_INV)
-    # cv2.imshow(bin_img)
     threshold = 120
     bin_img = gray.copy()
     bin_img[bin_img < threshold] = 0
@@ -89,8 +89,8 @@ if __name__ == '__main__':
     # img_gomi = cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
     # cv2.imshow("img_gomi", img_gomi)
     # cv2.waitKey(0)
-    img_gomi = img_alpha[y:y+h,x:x+w]
-    cv2.imwrite("img_gomi.png",img_gomi)
+    img_gomi = img_alpha[y:y+h, x:x+w]
+    cv2.imwrite("img_gomi.png", img_gomi)
 
     # 輪郭を描写
     cv2.drawContours(img2, contours, -1, color=(0, 255, 0), thickness=5)
@@ -102,12 +102,11 @@ if __name__ == '__main__':
         print(a, area)
         final_area = final_area + area
 
-    #cv2.imshow('img2', img2)
-    #cv2.waitKey(0)
-    cv2.imwrite('outline_.png', img2)
+
+    cv2.imwrite('outline.png', img2)
     print(final_area)
 
-    '''
+
     for doc in docs:
         print(u'{} => {}'.format(doc.id, doc.to_dict()))
     ###################################################################################
@@ -123,4 +122,3 @@ if __name__ == '__main__':
         blob.upload_from_file(f, content_type=content_type)
 
     final_name = start_name
-    '''
