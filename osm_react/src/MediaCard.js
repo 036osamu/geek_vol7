@@ -41,7 +41,17 @@ function calAttack(props) {
     if (props.progress >= 0) {
         return "GO GO"
     } else {
-        return Math.abs(Math.round((props.progress / props.max) * 100)) + '% Attacked!!'
+        return Math.abs(Math.round((props.progress / props.max) * 100)) + '％ Attacked!!'
+    }
+}
+
+function ackComment(props) {
+    if (props.progress == 0) {
+        return <div>現状維持！散らかさない！</div>
+    } else if (props.progress <= 0) {
+        return <div>{props.progress}のダメージ！！</div>
+    } else {
+        return <div>さぁ片付けましょう！！</div>
     }
 }
 
@@ -65,8 +75,7 @@ export default function MediaCard(props) {
                         {calAttack(props)}
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
-                        Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-                        across all continents except Antarctica
+                        {ackComment(props)}
                     </Typography>
                 </CardContent>
             </CardActionArea>

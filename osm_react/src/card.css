@@ -8,6 +8,11 @@ element.style {
     font-family: Shino !important;
 }
 
+.makeStyles-align_center-10 {
+    max-width: 50% !important;
+    max-height: 30% !important;
+}
+
 .MuiCardContent-root {
     background-color: white !important;
 }

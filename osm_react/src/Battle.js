@@ -13,9 +13,14 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Image from './158e35945dfb441ed15105ed7c0e7849.png'
 
-import monster1 from './data/100.png'
-import monster2 from './data/101.png'
-import monster3 from './data/102.png'
+import monster1 from './data/200.png'
+import monster2 from './data/201.png'
+import monster3 from './data/202.png'
+import kata_logo from './data/katazuquestC.png'
+
+import mama1 from './data/apron_mama.png'
+import mama2 from './data/mother_angry.png'
+
 
 import {Container} from "@material-ui/core";
 import LinearProgress from '@material-ui/core/LinearProgress';
@@ -26,6 +31,7 @@ import Animate from 'animate.css-react'
 import {Animated} from "react-animated-css";
 import 'animate.css/animate.css'
 import TransitionsModal from "./TransitionModal";
+import './App.css'
 
 
 let hp = 0;
@@ -34,6 +40,8 @@ let hp_diff = 0;
 let hp_before = 0;
 let img_shape;
 var image_url;
+var image_url_res
+let count_gomi;
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_KEY,
@@ -93,9 +101,9 @@ const styles = {
 
 function Battle() {
     const [hp_value, setHp] = useState(hp)
-    const [monster_file, setMonsterFile] = useState(monster1)
+    const [monster_file, setMonsterFile] = useState(kata_logo)
     const [monster_level, setMonsterLevel] = useState(1)
-    const [monster_name, setMonsterName] = useState('gozilla')
+    const [monster_name, setMonsterName] = useState('カエポン')
     const [Url_url, setUrl] = useState('')
     const [animate_flag, setAnimate_flag] = useState(false)
     const [modal_flag, setModalFlag] = useState(false)
@@ -108,6 +116,7 @@ function Battle() {
             setHp(hp.amount);
             hp_max = hp.hp_max;
             hp_diff = hp.hp_diff;
+            count_gomi = hp.count_gomi
             // console.log("diff: ", hp_diff);
             // console.log("AMOUNT: ", hp_value);
             if (hp_before != hp_value && hp_diff <= 0) {
@@ -118,18 +127,18 @@ function Battle() {
                     setModalFlag(true)
                 }
             }
-            if (hp_before != hp_value && hp_diff >= 0) {
-                if (hp_value > 50000 && hp_value < 100000) {
+            if (hp_before != hp_value && hp_diff > 0) {
+                if (hp_value > 30000 && hp_value < 100000) {
                     setMonsterFile(monster2)
-                    setMonsterName('python')
+                    setMonsterName('なこ')
                     setMonsterLevel(2)
                 } else if (hp_value > 100000) {
                     setMonsterFile(monster3)
-                    setMonsterName('irohasu')
+                    setMonsterName('美菜子')
                     setMonsterLevel(3)
                 } else {
                     setMonsterFile(monster1)
-                    setMonsterName('gozilla')
+                    setMonsterName('カエポン')
                     setMonsterLevel(1)
                 }
                 console.log(monster_file)
@@ -150,8 +159,55 @@ function Battle() {
         // Handle any errors
     });
 
+    function getGomi() {
+
+        storageRef.child(`result_img.png`).getDownloadURL().then(function (url) {
+            console.log("url", url)
+            image_url_res = url;
+            return url;
+            // console.log('img', url)
+        }).catch(function (error) {
+            // Handle any errors
+        });
+        console.log(image_url)
+        return image_url_res
+    }
+
+    //props.count
+
+
     function change_flag() {
         setAnimate_flag(!animate_flag)
+    }
+
+    function popup_modal(flg) {
+        console.log('okokok')
+        if (flg == true) {
+            const itemData = [];
+            itemData.push({img: getGomi(), key: 'key'})
+            return <TransitionsModal flag={true} storage={storageRef} count={count_gomi} data={itemData}/>
+        }
+
+    }
+
+    function mamaCard() {
+        if (hp_value != 0 && hp_diff <= 0) {
+            return <MediaCard
+                image={Url_url}
+                progress={hp_diff} max={hp_max}/>
+        } else if (hp_value == 0 && hp_diff == 0) {
+            return <MediaCard
+                image={mama1}
+                progress={hp_diff} max={hp_max}/>
+        } else if (hp_value >= 0 && hp_diff >= 0) {
+            return <MediaCard
+                image={mama2}
+                progress={hp_diff} max={hp_max}/>
+        } else {
+            return <MediaCard
+                image={Url_url}
+                progress={hp_diff} max={hp_max}/>
+        }
     }
 
     const classes = useStyles();
@@ -162,24 +218,36 @@ function Battle() {
                 <Grid container alignItems="center" justify="center" direction={"row"} spacing={1}
                       style={styles.container3}>
                     <Grid item alignItems="center" direction={"column"} xs={4}>
-                        <Paper className={classes.paper}>名前 {monster_name}</Paper>
-                        <Paper className={classes.paper}>LEVEL {monster_level}/3</Paper>
-                        <Paper className={classes.paper}>体力 {hp_max}</Paper>
+                        <div className="box_DQ_out">
+                            <div className="box_DQ_in">
+                                <p>名前</p>
+                                <p>{monster_name}</p>
+                            </div>
+                        </div>
+                        <div className="box_DQ_out">
+                            <div className="box_DQ_in">
+                                LEVEL {monster_level}/3
+                            </div>
+                        </div>
+                        <div className="box_DQ_out">
+                            <div className="box_DQ_in">
+                                体力 {hp_max}
+                            </div>
+                        </div>
                     </Grid>
                     <Grid item alignItems="center" justify={"center"} direction={"column"} xs={4}>
                         <CustomizedProgressBars progress={hp_value} max={hp_max}/>
-                        <div className={animate_flag ? "animate__animated animate__tada" : ""}
+                        <div className={animate_flag ? "animate__animated animate__flash" : ""}
                              onClick={change_flag} style={styles.image_center} onAnimationEnd={change_flag}>
                             <img src={monster_file} style={styles.image_center}/>
                         </div>
-                        <TransitionsModal flag={modal_flag}/>
+                        {/*<div>{modal_flag.toString()}</div>*/}
+                        <div>{popup_modal(modal_flag)}</div>
 
                     </Grid>
                     <Grid item alignItems="center" direction={"column"} xs={4}>
                         <div style={styles.log_card}>
-                            <MediaCard
-                                image={Url_url}
-                                progress={hp_diff} max={hp_max}/>
+                            {mamaCard()}
                         </div>
                     </Grid>
                 </Grid>
