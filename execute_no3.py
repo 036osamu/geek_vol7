@@ -10,6 +10,8 @@ from firebase_admin import credentials
 from firebase_admin import firestore, storage
 import subprocess
 
+from PIL import Image, ImageFilter
+
 def find_cont(img_before, img_after):
     fgbg = cv2.createBackgroundSubtractorMOG2()
 
@@ -32,15 +34,35 @@ def find_cont(img_before, img_after):
     img_bin = cv2.morphologyEx(img_bin, cv2.MORPH_OPEN, kernel)
     # cv2.imshow("bin_img",bin_img)
     # cv2.waitKey(0)
+    cv2.imwrite("img_bin.png",img_bin)
 
 
     # 輪郭抽出
     tmp_contours, hierarchy = cv2.findContours(img_bin, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     return tmp_contours
 
+def result_img(count_gomi):
+    img_list = [Image.open('gomi_{}.png'.format(i+1)) for i in range(count_gomi)]
+    # print(img_list)
+    img_width = [i.size[0] for i in img_list]
+    img_height = [i.size[1] for i in img_list]
+
+    img_height_result = max(img_height)+200
+    img_width_result = sum(img_width)+100*count_gomi+100
+
+
+    bg = Image.new("RGBA", (img_width_result, img_height_result), (255, 255, 255, 0))
+
+    tmp_width = 0
+    for i, im in enumerate(img_list):
+        bg.paste(im, (int(100+tmp_width), int((img_height_result-im.size[1])/2)))
+        tmp_width = tmp_width + im.size[0] + 100
+
+    bg.save("result_img.png")
+
 if __name__ == '__main__':
     cred = credentials.Certificate(
-        "/Users/daiki.m/Desktop/supporters/gikucamp-firebase-adminsdk-bw43u-2fb954e096.json")
+        "gikucamp-firebase-adminsdk-bw43u-3c588aa9ee.json")
     firebase_admin.initialize_app(cred, {'storageBucket': 'gikucamp.appspot.com'})
     db = firestore.client()
     doc_ref = db.collection(u'data').document(u'90TwVL13wTuPpmCgw24C')
@@ -59,12 +81,11 @@ if __name__ == '__main__':
     area_total_previous = 0
     area_total = 0
     count_gomi = 0
+    hp_max = 0
+    count_gomi = 0
 
     camera = cv2.VideoCapture(0)
     for i in range(1, 600):
-        if area_total == 0:
-            hp_max = 0
-            count_gomi = 0
         # if area_total > hp_max:
         #     hp_max = area_total
         ret, frame = camera.read()
@@ -92,7 +113,7 @@ if __name__ == '__main__':
         #     print(cv2.contourArea(i))
 
         # 小さい輪郭を削除
-        cont_A = list(filter(lambda x: cv2.contourArea(x) > 10000, cont_n))
+        cont_A = list(filter(lambda x: cv2.contourArea(x) > 20000, cont_n))
         # print("contours-", cont_n)
 
         # 輪郭を描写
@@ -173,7 +194,15 @@ if __name__ == '__main__':
             u'hp_diff': f"{area_total - area_total_previous}",
 
         })
+        if area_total == 0:
+            result_path = "result_img.png"
+            result_img(count_gomi)
+            blob_result_path = bucket.blob(result_path)
+            with open(result_path, 'rb') as f:
+                blob_result_path.upload_from_file(f, content_type=content_type)
 
+            hp_max = 0
+            count_gomi = 0
 
 
         print("今置け！")
