@@ -7,13 +7,13 @@ import os
 
 
 #初めの画像を取り込む
-camera = cv2.VideoCapture(1)
+camera = cv2.VideoCapture(0)
 
 ret, frame = camera.read()
 
 if ret:
     print('Success')
-    cv2.imwrite('start.png', frame)
+    cv2.imwrite('final0.png', frame)
     
 else:
     print('Failed')
